@@ -1,5 +1,4 @@
-// TODO: Can we add some debug and release versions?
-
+// TODO: Can we cross-compile for another OS?
 
 // We need to have an array that can hold our different configs
 // for Debug and Release
@@ -30,6 +29,12 @@ Compiler('gcc-linux')
     .flavour = 'debug'
     .CompilerOptions_Flavour = ' -g'
 ]
+.Config_Release = [
+    .CompilerOutputPath = "build/release/intermediate"
+    .Flavour = 'Release'
+    .flavour = 'release'
+    .CompilerOptions_Flavour = ' -O3'
+]
 
 // Merge the common config with the Flavour-specific config
 .BuildConfig_Debug = [
@@ -51,10 +56,14 @@ Compiler('gcc-linux')
 
     .CompilerOptions + .CompilerOptions_Flavour
 ]
+.BuildConfig_Release = [
+    Using(.Config)
+    Using(.Config_Release)
+    .CompilerOptions + .CompilerOptions_Flavour
+]
 
 .BuildConfigs + .BuildConfig_Debug // Add this config to our array of configs
-
-// TODO: Add a Release flavour
+.BuildConfigs + .BuildConfig_Release
 
 #endif
 
