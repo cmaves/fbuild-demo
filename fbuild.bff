@@ -1,5 +1,62 @@
 // TODO: Can we add some debug and release versions?
 
+
+// We need to have an array that can hold our different configs
+// for Debug and Release
+.BuildConfigs = {}
+
+// FASTBuild has some simple macros that are C-like
+#if __LINUX__
+
+Compiler('gcc-linux')
+{
+    .Executable = '/usr/bin/gcc'
+    .CompilerFamily = 'gcc'
+}
+
+// This config represents options that are common across flavours
+.Config = [
+    .Compiler = 'gcc-linux'
+    .CompilerOptions = '-c -I include -o %2 %1'
+    .Linker = '/usr/bin/gcc'
+    .LinkerType = 'gcc'
+]
+
+// Flavour-specific config is defined here
+.Config_Debug = [
+    .CompilerOutputPath = "build/debug/intermediate"
+    .Flavour = 'Debug'
+    .CompilerOptions_Flavour = ' -g'
+]
+
+// Merge the common config with the Flavour-specific config
+.BuildConfig_Debug = [
+    // 'Using 'is a special "function".
+    // It doesn't create node in the dependency graph.
+    // Instead brings a struct's members into scope
+    // This is equivelent to (defined by .Config above):
+    // .Compiler = 'gcc-linux'
+    // .CompilerOptions = '-c -I include -o %2 %1'
+    // .Linker = '/usr/bin/gcc'
+    // .LinkerType = 'gcc'
+    Using(.Config)
+
+    // Equivelent to:
+    //.CompilerOutputPath = "build/debug/intermediate"
+    //.Flavour = 'Debug'
+    //.CompilerOptions_Flavour = ' -g' // Flavour specific config
+    Using(.Config_Debug)
+
+    .CompilerOptions + .CompilerOptions_Flavour
+]
+
+.BuildConfigs + .BuildConfig_Debug // Add this config to our array of configs
+
+// TODO: Use our new config
+// TODO: Add a Release flavour
+
+#endif
+
 // .Compiler, .CompilerOptions, and .CompilerOutputPath
 // will be consumed by apporiate function below (ObjectList) 
 // if they aren't overridden.
