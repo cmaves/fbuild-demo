@@ -1,27 +1,22 @@
-// This file defines the build to take to compile 
-// object files for a library.
+// TODO: Link the DLL and main object into an executable
 
-// TODO: Use this library in an executable
-
-// Define the compiler. This provides FASTBuild with some basic info
-// on your compiler. It creates a Compiler Node in the dependency graph
-Compiler('gcc')
+// .Compiler, .CompilerOptions, and .CompilerOutputPath
+// will be consumed by apporiate function below (ObjectList) 
+// if they aren't overridden.
+.Compiler = 'gcc'
+.CompilerOptions = "-c -g -I include -o %2 %1"
+.CompilerOutputPath = 'build/intermediate'
+Compiler(.Compiler)
 {
     .Executable = '/usr/bin/gcc'
     .CompilerFamily = 'gcc'
 }
 
 // Define the objects that are apart of our Fib library.
-// The .Compiler option creates deps on 'gcc' defined above
-// and .CompilerInputFiles creates a dependency on 'fib.c'
 ObjectList('Fib-Obj')
 {
-    .Compiler = 'gcc' // Same string as the Compiler defined above
-    // %n are special values that will be subsititude in by FASTBuild
-    .CompilerOptions = "-c -g -I include -o %2 %1"
-
+    // .Compiler is defined above. ObjectList will implicitly consume it
     .CompilerInputFiles = 'fib.c'
-    .CompilerOutputPath = 'build/intermediate'
 }
 
 // Define the DLL target
@@ -34,11 +29,16 @@ DLL('Fib-DLL')
     .Libraries = 'Fib-Obj' // This provides our link back to Fib-Obj
 }
 
+ObjectList('Main-Obj')
+{
+    .CompilerInputFiles = 'main.c'
+}
+
 // 'all' is the default target. 
 // Running ./fbuild is equivelent to ./fbuild all
 // This make it easy run FASTBuild without args.
 Alias('all')
 {
-    .Targets = { 'Fib-DLL' }
+    .Targets = { 'Fib-DLL', 'Main-Obj' }
 }
 
