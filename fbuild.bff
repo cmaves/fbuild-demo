@@ -1,4 +1,4 @@
-// TODO: Link the DLL and main object into an executable
+// TODO: Can we add some debug and release versions?
 
 // .Compiler, .CompilerOptions, and .CompilerOutputPath
 // will be consumed by apporiate function below (ObjectList) 
@@ -12,6 +12,8 @@ Compiler(.Compiler)
     .CompilerFamily = 'gcc'
 }
 
+.Linker = '/usr/bin/gcc'
+
 // Define the objects that are apart of our Fib library.
 ObjectList('Fib-Obj')
 {
@@ -22,7 +24,6 @@ ObjectList('Fib-Obj')
 // Define the DLL target
 DLL('Fib-DLL')
 {
-    .Linker = '/usr/bin/gcc' // I don't know why FASTBuild defines a Compiler node but not a linker node
     .LinkerOutput = 'build/libfib.so'
     // %n are special values that will be subsititude in by FASTBuild
     .LinkerOptions = '-shared -fPIC -o %2 %1'
@@ -34,11 +35,18 @@ ObjectList('Main-Obj')
     .CompilerInputFiles = 'main.c'
 }
 
+Executable('Main-Exe')
+{
+    .LinkerOutput = 'main'
+    .LinkerOptions = '-o %2 %1'
+    .Libraries = { 'Main-Obj', 'Fib-DLL' }
+}
+
 // 'all' is the default target. 
 // Running ./fbuild is equivelent to ./fbuild all
 // This make it easy run FASTBuild without args.
 Alias('all')
 {
-    .Targets = { 'Fib-DLL', 'Main-Obj' }
+    .Targets = { 'Main-Exe' }
 }
 
