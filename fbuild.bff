@@ -6,45 +6,21 @@
 #include "toolchains/linux.bff"
 #include "toolchains/win.bff"
 
-// TODO: De-duplicate the generation of Recursive Fib using common/dll.bff
 // Recursive Fib DLL
-ForEach(.BuildConfig in .BuildConfigs)
-{
-    Using(.BuildConfig)
-    .CompilerOutputPath = "build/$os$/$flavour$/intermediate"
+.LibArgs = [
+    .FName = 'Fib'
+    .LName = 'fib'
+    .CompilerInputFiles = "fib.c"
+]
+#include "common/dll.bff"
 
-    .FibObjName = 'Fib-Obj-$OS$-$Flavour$'
-    ObjectList(.FibObjName)
-    {
-        .CompilerInputFiles = "fib.c"
-    }
-    .FibDLLName = 'Fib-DLL-$OS$-$Flavour$'
-    DLL(.FibDLLName)
-    {
-        .LinkerOutput = 'build/$os$/$flavour$/$LibPrefix$fib$LibSuffix$'
-        .Libraries = .FibObjName
-    }
-}
-
-// TODO: De-duplicate the generation of Iterative Fib using common/dll.bff
 // Iterative Fib DLL
-ForEach(.BuildConfig in .BuildConfigs)
-{
-    Using(.BuildConfig)
-    .CompilerOutputPath = "build/$os$/$flavour$/intermediate"
-    .FibIterObjName = 'FibIter-Obj-$OS$-$Flavour$'
-    ObjectList(.FibIterObjName)
-    {
-        .CompilerInputFiles = "fib_iter.c"
-    }
-
-    .FibIterDLLName = 'FibIter-DLL-$OS$-$Flavour$'
-    DLL(.FibIterDLLName)
-    {
-        .LinkerOutput = 'build/$os$/$flavour$/$LibPrefix$fib-iter$LibSuffix$'
-        .Libraries = .FibIterObjName
-    }
-}
+.LibArgs = [
+    .FName = 'FibIter'
+    .LName = 'fib_iter'
+    .CompilerInputFiles = "fib_iter.c"
+]
+#include "common/dll.bff"
 
 .AllTargets = {}
 ForEach(.BuildConfig in .BuildConfigs)
