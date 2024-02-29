@@ -13,8 +13,10 @@ Compiler('gcc-linux')
     .CompilerFamily = 'gcc'
 }
 
-// This config represents options that are common across flavours
-.Config = [
+// This config represents options that are common across flavours for the Linux
+.Config_Linux = [
+    .OS = 'Linux'
+    .os = 'linux'
     .Compiler = 'gcc-linux'
     .CompilerOptions = '-c -I include -o %2 %1'
     .Linker = '/usr/bin/gcc'
@@ -23,47 +25,35 @@ Compiler('gcc-linux')
 ]
 
 // Flavour-specific config is defined here
-.Config_Debug = [
-    .CompilerOutputPath = "build/debug/intermediate"
+.Config_Linux_Debug = [
+    .CompilerOutputPath = "build/linux/debug/intermediate" // TODO: can this be cleaned up
     .Flavour = 'Debug'
     .flavour = 'debug'
     .CompilerOptions_Flavour = ' -g'
 ]
-.Config_Release = [
-    .CompilerOutputPath = "build/release/intermediate"
+.Config_Linux_Release = [
+    .CompilerOutputPath = "build/linux/release/intermediate"
     .Flavour = 'Release'
     .flavour = 'release'
     .CompilerOptions_Flavour = ' -O3'
 ]
 
-// Merge the common config with the Flavour-specific config
-.BuildConfig_Debug = [
-    // 'Using 'is a special "function".
-    // It doesn't create node in the dependency graph.
-    // Instead brings a struct's members into scope
-    // This is equivelent to (defined by .Config above):
-    // .Compiler = 'gcc-linux'
-    // .CompilerOptions = '-c -I include -o %2 %1'
-    // .Linker = '/usr/bin/gcc'
-    // .LinkerType = 'gcc'
-    Using(.Config)
-
-    // Equivelent to:
-    //.CompilerOutputPath = "build/debug/intermediate"
-    //.Flavour = 'Debug'
-    //.CompilerOptions_Flavour = ' -g' // Flavour specific config
-    Using(.Config_Debug)
-
+// Merge the common OS config with the Flavour-specific config
+.BuildConfig_Linux_Debug = [
+    Using(.Config_Linux)
+    Using(.Config_Linux_Debug)
     .CompilerOptions + .CompilerOptions_Flavour
 ]
-.BuildConfig_Release = [
-    Using(.Config)
-    Using(.Config_Release)
+.BuildConfig_Linux_Release = [
+    Using(.Config_Linux)
+    Using(.Config_Linux_Release)
     .CompilerOptions + .CompilerOptions_Flavour
 ]
 
-.BuildConfigs + .BuildConfig_Debug // Add this config to our array of configs
-.BuildConfigs + .BuildConfig_Release
+.BuildConfigs + .BuildConfig_Linux_Debug // Add this config to our array of configs
+.BuildConfigs + .BuildConfig_Linux_Release
+
+// TODO: Add Windows configuration
 
 #endif
 
@@ -73,29 +63,29 @@ ForEach(.BuildConfig in .BuildConfigs)
     // For each BuildConfig we need to bring is parameters into scope
     Using(.BuildConfig)
 
-    .FibObjName = 'Fib-Obj-$Flavour$' // The node's name must be unique
+    .FibObjName = 'Fib-Obj-$OS$-$Flavour$'
     ObjectList(.FibObjName)
     {
         .CompilerInputFiles = "fib.c"
     }
 
-    .FibDLLName = 'Fib-DLL-$Flavour$'
+    .FibDLLName = 'Fib-DLL-$OS$-$Flavour$'
     DLL(.FibDLLName)
     {
-        .LinkerOutput = 'build/$flavour$/libfib.so'
+        .LinkerOutput = 'build/$os$/$flavour$/libfib.so'
         .Libraries = .FibObjName
     }
 
-    .MainObjName = 'Main-Obj-$Flavour$'
+    .MainObjName = 'Main-Obj-$OS$-$Flavour$'
     ObjectList(.MainObjName)
     {
         .CompilerInputFiles = 'main.c'
     }
 
-    .MainExeName = 'Main-Exe-$Flavour$'
+    .MainExeName = 'Main-Exe-$OS$-$Flavour$'
     Executable(.MainExeName)
     {
-        .LinkerOutput = 'main_$flavour$'
+        .LinkerOutput = 'main_$os$_$flavour$'
         .LinkerOptions = '-o %2 %1'
         .Libraries = { .MainObjName, .FibDLLName }
     }
