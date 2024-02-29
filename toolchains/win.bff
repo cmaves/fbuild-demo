@@ -1,0 +1,47 @@
+#if __LINUX__
+
+Compiler('gcc-win')
+{
+    .Executable = '/usr/bin/x86_64-w64-mingw32-gcc'
+    .CompilerFamily = 'gcc'
+}
+
+.Config_Win = [
+    .OS = 'Win'
+    .os = 'win'
+    .Compiler = 'gcc-win'
+    .CompilerOptions = '-c -I include -o %2 %1'
+    .Linker = '/usr/bin/x86_64-w64-mingw32-gcc'
+    .LinkerType = 'gcc'
+    .LinkerOptions = '-shared -fPIC -o %2 %1'
+    .LibPrefix = ''
+    .LibSuffix = '.dll'
+    .ExeSuffix = '.exe'
+]
+
+.Config_Win_Debug = [
+    .Flavour = 'Debug'
+    .flavour = 'debug'
+    .CompilerOptions_Flavour = ' -g'
+]
+.Config_Win_Release = [
+    .Flavour = 'Release'
+    .flavour = 'release'
+    .CompilerOptions_Flavour = ' -O3'
+]
+
+.BuildConfig_Win_Debug = [
+    Using(.Config_Win)
+    Using(.Config_Win_Debug)
+    .CompilerOptions + .CompilerOptions_Flavour
+]
+.BuildConfig_Win_Release = [
+    Using(.Config_Win)
+    Using(.Config_Win_Release)
+    .CompilerOptions + .CompilerOptions_Flavour
+]
+
+.BuildConfigs + .BuildConfig_Win_Debug
+.BuildConfigs + .BuildConfig_Win_Release
+#endif
+
