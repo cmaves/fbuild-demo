@@ -22,6 +22,8 @@ Compiler('gcc-linux')
     .Linker = '/usr/bin/gcc'
     .LinkerType = 'gcc'
     .LinkerOptions = '-shared -fPIC -o %2 %1'
+    .LibPrefix = 'lib'
+    .LibSuffix = '.so'
 ]
 
 // Flavour-specific config is defined here
@@ -65,6 +67,8 @@ Compiler('gcc-win')
     .Linker = '/usr/bin/x86_64-w64-mingw32-gcc'
     .LinkerType = 'gcc'
     .LinkerOptions = '-shared -fPIC -o %2 %1'
+    .LibPrefix = ''
+    .LibSuffix = '.dll'
 ]
 
 .Config_Win_Debug = [
@@ -97,16 +101,15 @@ ForEach(.BuildConfig in .BuildConfigs)
     {
         .CompilerInputFiles = "fib.c"
     }
-    ^AllTargets + .FibObjName
+    .FibDLLName = 'Fib-DLL-$OS$-$Flavour$'
+    DLL(.FibDLLName)
+    {
+        .LinkerOutput = 'build/$os$/$flavour$/$LibPrefix$fib$LibSuffix$'
+        .Libraries = .FibObjName
+    }
+    ^AllTargets + .FibDLLName
 
-// TODO: Update the names of DLLs to match OS convention
-//    .FibDLLName = 'Fib-DLL-$OS$-$Flavour$'
-//    DLL(.FibDLLName)
-//    {
-//        .LinkerOutput = 'build/$os$/$flavour$/libfib.so'
-//        .Libraries = .FibObjName
-//    }
-//
+// TODO: Update the names of EXEs to match OS convention
 //    .MainObjName = 'Main-Obj-$OS$-$Flavour$'
 //    ObjectList(.MainObjName)
 //    {
