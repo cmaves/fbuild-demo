@@ -6,6 +6,8 @@
 #include "toolchains/linux.bff"
 #include "toolchains/win.bff"
 
+// TODO: De-duplicate the generation of library targets
+// Recursive Fib DLL
 ForEach(.BuildConfig in .BuildConfigs)
 {
     Using(.BuildConfig)
@@ -24,7 +26,24 @@ ForEach(.BuildConfig in .BuildConfigs)
     }
 }
 
-// TODO: Add ObjectList and DLL for FibIter
+// Iterative Fib DLL
+ForEach(.BuildConfig in .BuildConfigs)
+{
+    Using(.BuildConfig)
+    .CompilerOutputPath = "build/$os$/$flavour$/intermediate"
+    .FibIterObjName = 'FibIter-Obj-$OS$-$Flavour$'
+    ObjectList(.FibIterObjName)
+    {
+        .CompilerInputFiles = "fib_iter.c"
+    }
+
+    .FibIterDLLName = 'FibIter-DLL-$OS$-$Flavour$'
+    DLL(.FibIterDLLName)
+    {
+        .LinkerOutput = 'build/$os$/$flavour$/$LibPrefix$fib-iter$LibSuffix$'
+        .Libraries = .FibIterObjName
+    }
+}
 
 .AllTargets = {}
 ForEach(.BuildConfig in .BuildConfigs)
@@ -43,8 +62,10 @@ ForEach(.BuildConfig in .BuildConfigs)
     {
         .LinkerOutput = 'main-$os$-$flavour$$ExeSuffix$'
         .LinkerOptions = '-o %2 %1'
+
         .FibDLLName = 'Fib-DLL-$OS$-$Flavour$'
-        .Libraries = { .MainObjName, .FibDLLName }
+        .FibIterDLLName = 'FibIter-DLL-$OS$-$Flavour$'
+        .Libraries = { .MainObjName, .FibDLLName, .FibIterDLLName }
     }
     ^AllTargets + .MainExeName
 }
