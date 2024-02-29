@@ -6,10 +6,8 @@
 #include "toolchains/linux.bff"
 #include "toolchains/win.bff"
 
-.AllTargets = {} // We need the targets for every config for use with Alias
 ForEach(.BuildConfig in .BuildConfigs)
 {
-    // For each BuildConfig we need to bring is parameters into scope
     Using(.BuildConfig)
     .CompilerOutputPath = "build/$os$/$flavour$/intermediate"
 
@@ -24,6 +22,15 @@ ForEach(.BuildConfig in .BuildConfigs)
         .LinkerOutput = 'build/$os$/$flavour$/$LibPrefix$fib$LibSuffix$'
         .Libraries = .FibObjName
     }
+}
+
+// TODO: Add ObjectList and DLL for FibIter
+
+.AllTargets = {}
+ForEach(.BuildConfig in .BuildConfigs)
+{
+    Using(.BuildConfig)
+    .CompilerOutputPath = "build/$os$/$flavour$/intermediate"
 
     .MainObjName = 'Main-Obj-$OS$-$Flavour$'
     ObjectList(.MainObjName)
@@ -36,6 +43,7 @@ ForEach(.BuildConfig in .BuildConfigs)
     {
         .LinkerOutput = 'main-$os$-$flavour$$ExeSuffix$'
         .LinkerOptions = '-o %2 %1'
+        .FibDLLName = 'Fib-DLL-$OS$-$Flavour$'
         .Libraries = { .MainObjName, .FibDLLName }
     }
     ^AllTargets + .MainExeName
