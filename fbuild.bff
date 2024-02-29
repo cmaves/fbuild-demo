@@ -51,7 +51,37 @@ Compiler('gcc-linux')
 .BuildConfigs + .BuildConfig_Linux_Debug // Add this config to our array of configs
 .BuildConfigs + .BuildConfig_Linux_Release
 
-// TODO: Add Windows configuration
+Compiler('gcc-win')
+{
+    .Executable = '/usr/bin/x86_64-w64-mingw32-gcc'
+    .CompilerFamily = 'gcc'
+}
+
+.Config_Win = [
+    .OS = 'Win'
+    .os = 'win'
+    .Compiler = 'gcc-win'
+    .CompilerOptions = '-c -I include -o %2 %1'
+    .Linker = '/usr/bin/x86_64-w64-mingw32-gcc'
+    .LinkerType = 'gcc'
+    .LinkerOptions = '-shared -fPIC -o %2 %1'
+]
+
+.Config_Win_Debug = [
+    .Flavour = 'Debug'
+    .flavour = 'debug'
+    .CompilerOptions_Flavour = ' -g'
+]
+
+.BuildConfig_Win_Debug = [
+    Using(.Config_Win)
+    Using(.Config_Win_Debug)
+    .CompilerOptions + .CompilerOptions_Flavour
+]
+
+.BuildConfigs + .BuildConfig_Win_Debug
+
+// TODO: Add Windows Release config
 
 #endif
 
@@ -67,28 +97,29 @@ ForEach(.BuildConfig in .BuildConfigs)
     {
         .CompilerInputFiles = "fib.c"
     }
+    ^AllTargets + .FibObjName
 
-    .FibDLLName = 'Fib-DLL-$OS$-$Flavour$'
-    DLL(.FibDLLName)
-    {
-        .LinkerOutput = 'build/$os$/$flavour$/libfib.so'
-        .Libraries = .FibObjName
-    }
-
-    .MainObjName = 'Main-Obj-$OS$-$Flavour$'
-    ObjectList(.MainObjName)
-    {
-        .CompilerInputFiles = 'main.c'
-    }
-
-    .MainExeName = 'Main-Exe-$OS$-$Flavour$'
-    Executable(.MainExeName)
-    {
-        .LinkerOutput = 'main_$os$_$flavour$'
-        .LinkerOptions = '-o %2 %1'
-        .Libraries = { .MainObjName, .FibDLLName }
-    }
-    ^AllTargets + .MainExeName
+// TODO: Update the names of DLLs to match OS convention
+//    .FibDLLName = 'Fib-DLL-$OS$-$Flavour$'
+//    DLL(.FibDLLName)
+//    {
+//        .LinkerOutput = 'build/$os$/$flavour$/libfib.so'
+//        .Libraries = .FibObjName
+//    }
+//
+//    .MainObjName = 'Main-Obj-$OS$-$Flavour$'
+//    ObjectList(.MainObjName)
+//    {
+//        .CompilerInputFiles = 'main.c'
+//    }
+//
+//    .MainExeName = 'Main-Exe-$OS$-$Flavour$'
+//    Executable(.MainExeName)
+//    {
+//        .LinkerOutput = 'main_$os$_$flavour$'
+//        .LinkerOptions = '-o %2 %1'
+//        .Libraries = { .MainObjName, .FibDLLName }
+//    }
 }
 
 Alias('all'){
