@@ -11,7 +11,7 @@ Compiler('gcc-linux')
     .OS = 'Linux'
     .os = 'linux'
     .Compiler = 'gcc-linux'
-    .CompilerOptions = '-c -I include -o %2 %1'
+    .CompilerOptions_OS = '-c -I include -o %2 %1'
     .Linker = '/usr/bin/gcc'
     .LinkerType = 'gcc'
     .LinkerOptions = '-shared -fPIC -o %2 %1'
@@ -36,12 +36,12 @@ Compiler('gcc-linux')
 .BuildConfig_Linux_Debug = [
     Using(.Config_Linux)
     Using(.Config_Linux_Debug)
-    .CompilerOptions + .CompilerOptions_Flavour
+    .CompilerOptions = .CompilerOptions_OS + .CompilerOptions_Flavour
 ]
 .BuildConfig_Linux_Release = [
     Using(.Config_Linux)
     Using(.Config_Linux_Release)
-    .CompilerOptions + .CompilerOptions_Flavour
+    .CompilerOptions = .CompilerOptions_OS + .CompilerOptions_Flavour
 ]
 
 .BuildConfigs + .BuildConfig_Linux_Debug // Add this config to our array of configs

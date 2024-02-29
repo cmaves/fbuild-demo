@@ -1,9 +1,29 @@
 
 // Iterative Fib DLL
-.LibArgs = [
-    .FName = 'FibIter'
-    .LName = 'fib_iter'
-    .CompilerInputFiles = "fib_iter.c"
-]
-#include "../common/dll.bff"
+{
+    // Create scope to prevent leaking updated .BuildConfigs
+    .TmpBuildConfigs = {}
+    ForEach(.BuildConfig in .BuildConfigs)
+    {
+        .BuildConfig =  [
+            Using(.BuildConfig)
+
+            If(.flavour == 'debug')
+            {
+                ^CompilerOptions_Flavour = ' -g -O1'
+                ^CompilerOptions = .CompilerOptions_OS + .CompilerOptions_Flavour
+
+            }
+        ]
+        ^TmpBuildConfigs + .BuildConfig
+    }
+    .BuildConfigs = .TmpBuildConfigs
+
+    .LibArgs = [
+        .FName = 'FibIter'
+        .LName = 'fib_iter'
+        .CompilerInputFiles = "fib_iter.c"
+    ]
+    #include "../common/dll.bff"
+}
 

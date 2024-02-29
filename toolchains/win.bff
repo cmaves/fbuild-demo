@@ -10,7 +10,7 @@ Compiler('gcc-win')
     .OS = 'Win'
     .os = 'win'
     .Compiler = 'gcc-win'
-    .CompilerOptions = '-c -I include -o %2 %1'
+    .CompilerOptions_OS = '-c -I include -o %2 %1'
     .Linker = '/usr/bin/x86_64-w64-mingw32-gcc'
     .LinkerType = 'gcc'
     .LinkerOptions = '-shared -fPIC -o %2 %1'
@@ -33,12 +33,12 @@ Compiler('gcc-win')
 .BuildConfig_Win_Debug = [
     Using(.Config_Win)
     Using(.Config_Win_Debug)
-    .CompilerOptions + .CompilerOptions_Flavour
+    .CompilerOptions = .CompilerOptions_OS + .CompilerOptions_Flavour
 ]
 .BuildConfig_Win_Release = [
     Using(.Config_Win)
     Using(.Config_Win_Release)
-    .CompilerOptions + .CompilerOptions_Flavour
+    .CompilerOptions = .CompilerOptions_OS + .CompilerOptions_Flavour
 ]
 
 .BuildConfigs + .BuildConfig_Win_Debug
