@@ -1,0 +1,9 @@
+
+// Iterative Fib DLL
+.LibArgs = [
+    .FName = 'FibIter'
+    .LName = 'fib_iter'
+    .CompilerInputFiles = "fib_iter.c"
+]
+#include "../common/dll.bff"
+

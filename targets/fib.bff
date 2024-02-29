@@ -1,0 +1,9 @@
+
+// Recursive Fib DLL
+.LibArgs = [
+    .FName = 'Fib'
+    .LName = 'fib'
+    .CompilerInputFiles = "fib.c"
+]
+#include "../common/dll.bff"
+

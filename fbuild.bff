@@ -6,21 +6,8 @@
 #include "toolchains/linux.bff"
 #include "toolchains/win.bff"
 
-// Recursive Fib DLL
-.LibArgs = [
-    .FName = 'Fib'
-    .LName = 'fib'
-    .CompilerInputFiles = "fib.c"
-]
-#include "common/dll.bff"
-
-// Iterative Fib DLL
-.LibArgs = [
-    .FName = 'FibIter'
-    .LName = 'fib_iter'
-    .CompilerInputFiles = "fib_iter.c"
-]
-#include "common/dll.bff"
+#include "targets/fib.bff"
+#include "targets/fib_iter.bff"
 
 .AllTargets = {}
 ForEach(.BuildConfig in .BuildConfigs)
