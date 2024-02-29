@@ -24,6 +24,7 @@ Compiler('gcc-linux')
     .LinkerOptions = '-shared -fPIC -o %2 %1'
     .LibPrefix = 'lib'
     .LibSuffix = '.so'
+    .ExeSuffix = ''
 ]
 
 // Flavour-specific config is defined here
@@ -69,6 +70,7 @@ Compiler('gcc-win')
     .LinkerOptions = '-shared -fPIC -o %2 %1'
     .LibPrefix = ''
     .LibSuffix = '.dll'
+    .ExeSuffix = '.exe'
 ]
 
 .Config_Win_Debug = [
@@ -107,22 +109,21 @@ ForEach(.BuildConfig in .BuildConfigs)
         .LinkerOutput = 'build/$os$/$flavour$/$LibPrefix$fib$LibSuffix$'
         .Libraries = .FibObjName
     }
-    ^AllTargets + .FibDLLName
 
-// TODO: Update the names of EXEs to match OS convention
-//    .MainObjName = 'Main-Obj-$OS$-$Flavour$'
-//    ObjectList(.MainObjName)
-//    {
-//        .CompilerInputFiles = 'main.c'
-//    }
-//
-//    .MainExeName = 'Main-Exe-$OS$-$Flavour$'
-//    Executable(.MainExeName)
-//    {
-//        .LinkerOutput = 'main_$os$_$flavour$'
-//        .LinkerOptions = '-o %2 %1'
-//        .Libraries = { .MainObjName, .FibDLLName }
-//    }
+    .MainObjName = 'Main-Obj-$OS$-$Flavour$'
+    ObjectList(.MainObjName)
+    {
+        .CompilerInputFiles = 'main.c'
+    }
+
+    .MainExeName = 'Main-Exe-$OS$-$Flavour$'
+    Executable(.MainExeName)
+    {
+        .LinkerOutput = 'main-$os$-$flavour$$ExeSuffix$'
+        .LinkerOptions = '-o %2 %1'
+        .Libraries = { .MainObjName, .FibDLLName }
+    }
+    ^AllTargets + .MainExeName
 }
 
 Alias('all'){
