@@ -76,9 +76,21 @@ ForEach(.BuildConfig in .BuildConfigs)
         .LinkerOutput = 'build/$flavour$/libfib.so'
         .Libraries = .FibObjName
     }
-    ^AllTargets + .FibDLLName
 
-    // TODO: where did the rest of our targets go? We'll re-add them in a bit...
+    .MainObjName = 'Main-Obj-$Flavour$'
+    ObjectList(.MainObjName)
+    {
+        .CompilerInputFiles = 'main.c'
+    }
+
+    .MainExeName = 'Main-Exe-$Flavour$'
+    Executable(.MainExeName)
+    {
+        .LinkerOutput = 'main_$flavour$'
+        .LinkerOptions = '-o %2 %1'
+        .Libraries = { .MainObjName, .FibDLLName }
+    }
+    ^AllTargets + .MainExeName
 }
 
 Alias('all'){
