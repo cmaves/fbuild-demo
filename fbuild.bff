@@ -26,13 +26,11 @@ Compiler('gcc-linux')
 
 // Flavour-specific config is defined here
 .Config_Linux_Debug = [
-    .CompilerOutputPath = "build/linux/debug/intermediate" // TODO: can this be cleaned up
     .Flavour = 'Debug'
     .flavour = 'debug'
     .CompilerOptions_Flavour = ' -g'
 ]
 .Config_Linux_Release = [
-    .CompilerOutputPath = "build/linux/release/intermediate"
     .Flavour = 'Release'
     .flavour = 'release'
     .CompilerOptions_Flavour = ' -O3'
@@ -62,6 +60,7 @@ ForEach(.BuildConfig in .BuildConfigs)
 {
     // For each BuildConfig we need to bring is parameters into scope
     Using(.BuildConfig)
+    .CompilerOutputPath = "build/$os$/$flavour$/intermediate"
 
     .FibObjName = 'Fib-Obj-$OS$-$Flavour$'
     ObjectList(.FibObjName)
