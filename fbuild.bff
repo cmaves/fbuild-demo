@@ -52,58 +52,27 @@ Compiler('gcc-linux')
 
 .BuildConfigs + .BuildConfig_Debug // Add this config to our array of configs
 
-// TODO: Use our new config
 // TODO: Add a Release flavour
 
 #endif
 
-// .Compiler, .CompilerOptions, and .CompilerOutputPath
-// will be consumed by apporiate function below (ObjectList) 
-// if they aren't overridden.
-.Compiler = 'gcc'
-.CompilerOptions = "-c -g -I include -o %2 %1"
-.CompilerOutputPath = 'build/intermediate'
-Compiler(.Compiler)
+.AllTargets = {} // We need the targets for every config for use with Alias
+ForEach(.BuildConfig in .BuildConfigs)
 {
-    .Executable = '/usr/bin/gcc'
-    .CompilerFamily = 'gcc'
+    // For each BuildConfig we need to bring is parameters into scope
+    Using(.BuildConfig)
+
+    .FibObjName = 'Fib-Obj-$Flavour$' // The node's name must be unique
+    ObjectList(.FibObjName)
+    {
+        .CompilerInputFiles = "fib.c"
+    }
+
+    ^AllTargets + .FibObjName
 }
 
-.Linker = '/usr/bin/gcc'
-
-// Define the objects that are apart of our Fib library.
-ObjectList('Fib-Obj')
-{
-    // .Compiler is defined above. ObjectList will implicitly consume it
-    .CompilerInputFiles = 'fib.c'
+Alias('all'){
+    .Targets = .AllTargets
 }
 
-// Define the DLL target
-DLL('Fib-DLL')
-{
-    .LinkerOutput = 'build/libfib.so'
-    // %n are special values that will be subsititude in by FASTBuild
-    .LinkerOptions = '-shared -fPIC -o %2 %1'
-    .Libraries = 'Fib-Obj' // This provides our link back to Fib-Obj
-}
-
-ObjectList('Main-Obj')
-{
-    .CompilerInputFiles = 'main.c'
-}
-
-Executable('Main-Exe')
-{
-    .LinkerOutput = 'main'
-    .LinkerOptions = '-o %2 %1'
-    .Libraries = { 'Main-Obj', 'Fib-DLL' }
-}
-
-// 'all' is the default target. 
-// Running ./fbuild is equivelent to ./fbuild all
-// This make it easy run FASTBuild without args.
-Alias('all')
-{
-    .Targets = { 'Main-Exe' }
-}
-
+// TODO: where did the rest of our targets go? We'll re-add them in a bit...
