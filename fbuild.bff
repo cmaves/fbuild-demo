@@ -20,12 +20,14 @@ Compiler('gcc-linux')
     .CompilerOptions = '-c -I include -o %2 %1'
     .Linker = '/usr/bin/gcc'
     .LinkerType = 'gcc'
+    .LinkerOptions = '-shared -fPIC -o %2 %1'
 ]
 
 // Flavour-specific config is defined here
 .Config_Debug = [
     .CompilerOutputPath = "build/debug/intermediate"
     .Flavour = 'Debug'
+    .flavour = 'debug'
     .CompilerOptions_Flavour = ' -g'
 ]
 
@@ -68,11 +70,18 @@ ForEach(.BuildConfig in .BuildConfigs)
         .CompilerInputFiles = "fib.c"
     }
 
-    ^AllTargets + .FibObjName
+    .FibDLLName = 'Fib-DLL-$Flavour$'
+    DLL(.FibDLLName)
+    {
+        .LinkerOutput = 'build/$flavour$/libfib.so'
+        .Libraries = .FibObjName
+    }
+    ^AllTargets + .FibDLLName
+
+    // TODO: where did the rest of our targets go? We'll re-add them in a bit...
 }
 
 Alias('all'){
     .Targets = .AllTargets
 }
 
-// TODO: where did the rest of our targets go? We'll re-add them in a bit...
