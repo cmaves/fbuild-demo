@@ -1,0 +1,30 @@
+
+// common/dll.bff is used to create the ObjectList and DLL
+// targets for the configuration
+// It expects the follow arguments in the scope:
+// - .BuildConfigs: A array of configs to be used to build that should be compiled with
+// .LibArgs = [
+//   - .FName: The name of the library for FBuild targets
+//   - .LName: The name of the library to other programs
+//   - .CompilerInputFiles: Files that should be compiled
+// ]
+//
+// Nodes created:
+// - '$FName-Obj-$OS$-$Flavour$'
+// - '$FName-DLL-$OS$-$Flavour$'
+
+ForEach(.BuildConfig in .BuildConfigs)
+{
+    Using(.LibArgs)
+    Using(.BuildConfig)
+    .CompilerOutputPath = "build/$os$/$flavour$/intermediate"
+    .ObjName = '$FName$-Obj-$OS$-$Flavour$'
+    ObjectList(.ObjName){}
+
+    .DLLName = '$FName$-DLL-$OS$-$Flavour$'
+    DLL(.DLLName)
+    {
+        .LinkerOutput = 'build/$os$/$flavour$/$LibPrefix$$LName$$LibSuffix$'
+        .Libraries = .ObjName
+    }
+}

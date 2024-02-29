@@ -6,7 +6,7 @@
 #include "toolchains/linux.bff"
 #include "toolchains/win.bff"
 
-// TODO: De-duplicate the generation of library targets
+// TODO: De-duplicate the generation of Recursive Fib using common/dll.bff
 // Recursive Fib DLL
 ForEach(.BuildConfig in .BuildConfigs)
 {
@@ -26,6 +26,7 @@ ForEach(.BuildConfig in .BuildConfigs)
     }
 }
 
+// TODO: De-duplicate the generation of Iterative Fib using common/dll.bff
 // Iterative Fib DLL
 ForEach(.BuildConfig in .BuildConfigs)
 {
