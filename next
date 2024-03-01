@@ -1,0 +1,9 @@
+#!/bin/sh
+
+tag=`git tag --points-at | grep -E 'step-[0-9]{2}'`
+
+number=`echo $tag | grep -Eo '[0-9]{2}'`
+
+next=`expr $number + 1`
+fnext=`printf %02d $next`
+git checkout step-$fnext

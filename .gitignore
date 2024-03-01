@@ -1,0 +1,16 @@
+# Editors
+*.swp
+
+
+# Binarys
+/build
+*.so
+*.dll
+*.exe
+/main*
+!main.c
+
+# Build tools
+/fbuild
+fbuild*.linux.fdb
+
